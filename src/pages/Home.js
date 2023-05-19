@@ -356,7 +356,7 @@ function Home() {
                 columns={columns}
                 initialState={{
                   pagination: {
-                    paginationModel: { page: 0, pageSize: 50 },
+                    paginationModel: { page: 0, pageSize: 20 },
                   },
                 }}
                 pageSizeOptions={[5, 10, 20, 50]}
@@ -442,7 +442,7 @@ function Home() {
                 columns={columnsScale}
                 initialState={{
                   pagination: {
-                    paginationModel: { page: 0, pageSize: 50 },
+                    paginationModel: { page: 0, pageSize: 20 },
                   },
                 }}
                 pageSizeOptions={[5, 10, 20, 50]}

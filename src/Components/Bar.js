@@ -209,7 +209,7 @@ export default function Bar({check,change}) {
               onClose={handleCloseUserMenu}
             >
             <MenuItem key={"darkmodeSwitch"} onClick={change}>
-            <Typography textAlign="center">Escuro</Typography>
+            <Typography textAlign="center">Tema</Typography>
               <IconButton 
               color="default"
               onClick={change}
