@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import ModalConfigTime from "../Components/ModalConfigTime";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import {  toast } from 'react-toastify';
@@ -77,6 +78,7 @@ function Home() {
   const [ weightEdit, setWeightEdit ] = useState(null);
   const [ licenseEdit, setLicenseEdit ] = useState("");
   const [ saveEdit, setSaveEdit ] = useState(false);
+  const [ openModalTime, setOpenModalTime] = useState(false);
   const [ initialDate, setInitialDate ] = useState((actualDate) - ((60 * 1440) * 1000));
   const [ refresh, setRefresh ] = useState(false);
   const [ actualWeight, setActualWeight ] = useState(null);
