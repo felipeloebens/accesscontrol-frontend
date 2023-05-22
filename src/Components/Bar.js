@@ -2,7 +2,7 @@ import React from 'react';
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import {Menu as MenuIcon, Home as HomeIcon, Brightness4 , Brightness7, Close }  from '@mui/icons-material/';
-import {Button, Box, Container, Menu, MenuItem, IconButton, Typography, Toolbar, AppBar, Tooltip, Avatar, Modal, Grid, TextField } from '@mui/material/';
+import {CssBaseline, Box, Container, Menu, MenuItem, IconButton, Typography, Toolbar, AppBar, Tooltip, Avatar, Modal, Grid, TextField } from '@mui/material/';
 
 
 const pages = [{text: 'Motoristas', link:'Drives'},
@@ -29,7 +29,7 @@ const styleCloseButton = {
   top: '2%',
 };
 
-export default function Bar({check,change}) {
+export default function Bar(props,{check,change}) {
   
     const [anchorElNav, setAnchorElNav] = useState(null);
     const [anchorElUser, setAnchorElUser] = useState(null);
@@ -37,11 +37,12 @@ export default function Bar({check,change}) {
     const navigate = useNavigate();
     const [ open, setOpen] = useState(false);
 
+
     const handleClose = () => setOpen(false);
 
     const onButtonClick = (e, row) => {
       setOpen(true)
-  };
+    };
     
     const handleOpenNavMenu = (event) => {
       setAnchorElNav(event.currentTarget);
@@ -123,8 +124,8 @@ export default function Bar({check,change}) {
             </Grid>
             </Box>
           </Modal>
-
-    <AppBar id="appBar" position="static">
+  <CssBaseline />
+    <AppBar id="appBar" position="sticky">
       <Container maxWidth="xxl">
         <Toolbar disableGutters>
           <IconButton color='secondary'
