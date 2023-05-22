@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import ModalConfigTime from "../Components/ModalConfigTime";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import {  toast } from 'react-toastify';
@@ -9,7 +8,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import JSMpeg from '@cycjimmy/jsmpeg-player';
 import axios from 'axios';
 import { DataGrid } from '@mui/x-data-grid';
-import {Grid, Tabs, Tab, Typography, Box, Card, CardHeader, TextField, CircularProgress, Button, InputAdornment, IconButton, Modal, CardContent } from '@mui/material/';
+import {Grid, Chip, Tabs, Tab, Typography, Box, Card, CardHeader, TextField, CircularProgress, Button, InputAdornment, IconButton, Modal, CardContent } from '@mui/material/';
 import moment from "moment/moment";
 
 const styleModal = {
@@ -68,7 +67,8 @@ function Home() {
   const [ dateEnd, setDateEnd ] = useState(null);
   const [ dateStartScale, setDateStartScale ] = useState(null);
   const [ dateEndScale, setDateEndScale ] = useState(null);
-  const [ startSearch, setStartSeach ] = useState(true);
+  const [ startSearch, setStartSearch ] = useState(true);
+  const [ startSearchInterval, setStartSearchInterval ] = useState(false);
   const [ startSearchScale, setStartSeachScale ] = useState(true);
   const [ licenseFilter, setLicenseFilter ] = useState("");
   const [ licenseFilterScale, setLicenseFilterScale ] = useState("");
@@ -78,7 +78,6 @@ function Home() {
   const [ weightEdit, setWeightEdit ] = useState(null);
   const [ licenseEdit, setLicenseEdit ] = useState("");
   const [ saveEdit, setSaveEdit ] = useState(false);
-  const [ openModalTime, setOpenModalTime] = useState(false);
   const [ initialDate, setInitialDate ] = useState((actualDate) - ((60 * 1440) * 1000));
   const [ refresh, setRefresh ] = useState(false);
   const [ actualWeight, setActualWeight ] = useState(null);
@@ -121,9 +120,27 @@ function Home() {
     const interval = setInterval(() => {
       getScale().then((response) => {setActualWeight(response)});
     }, 1500);
-
     return () => clearInterval(interval);
   }, []);
+
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActualDate(Date.now());
+      setInitialDate((Date.now()) - ((60 * 1440) * 1000));
+      setStartSearchInterval(true);
+    }, 70000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if(startSearchInterval === true){
+      setStartSearch(true);
+      setStartSeachScale(true);
+    }
+      
+  }, [startSearchInterval]);
+
 
 
   useEffect(() => {
@@ -146,10 +163,10 @@ function Home() {
 
   useEffect(() => {
     if((dateEnd !== null) && (dateStart !== null) && startSearch){
-    getDataFlow().then((response) => {setDataFlow(response); setDataArray(response)}, setStartSeach(false))
+    getDataFlow().then((response) => {setDataFlow(response); setDataArray(response)}, setStartSearch(false), setStartSearchInterval(false))
     }
     if((dateEndScale !== null) && (dateStartScale !== null) && startSearchScale){
-      getDataScale().then((response) => {setDataScale(response); setDataArrayScale(response)}, setStartSeachScale(false))
+      getDataScale().then((response) => {setDataScale(response); setDataArrayScale(response)}, setStartSeachScale(false), setStartSearchInterval(false))
       }
   }, [startSearch, dateEnd, dateStart, startSearchScale, dateEndScale, dateStartScale])
 
@@ -197,7 +214,7 @@ function Home() {
       setActualDate(Date.now());
       setInitialDate((actualDate) - ((60 * 1440) * 1000));
       setRefresh(false);
-      setStartSeach(true);
+      setStartSearch(true);
       setStartSeachScale(true);
     }
   }, [refresh])
@@ -281,23 +298,64 @@ function Home() {
             </Grid>
             </Box>
           </Modal>
+
   
     <Grid container padding={1} spacing={1}>
+      
       <Grid item xs={12} md={12} lg={12}>
+
       <Card>
-        <CardHeader style={{ textAlign: 'left' }} title="Home"/>
+
+      <Grid container padding={1} sx={{ display: 'flex', alignItems: 'flex-start'  }}>
+        <Grid item padding={1} xs={12} md={12} lg={12} >
+        <Typography id="modalTittle" variant="h6" component="h2" sx={{marginBottom : "10px", marginLeft: '5px'}}>
+          Home
+        </Typography>
+
+            <Card elevation={3}>
+              <CardContent>
+                <Grid container>
+                <Grid item xs={12} md={12} lg={12} padding={1} style={{display: 'flex', gap:'10px'}}>
+                  <Typography id="modalTittle" variant="h6" component="h2" sx={{marginBottom : "10px", marginLeft: '5px'}}>
+                    Últimos eventos
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={12} lg={6} padding={1} style={{display: 'flex', gap:'10px'}}>
+                  <Typography id="modalTittle" variant="h6" component="h2" sx={{marginBottom : "10px", marginLeft: '5px'}}>
+                    Portaria
+                  </Typography>
+                    <Chip label={`Data/Hora: ${dataArray && dataArray[0]?.pass_date}`} />
+                    <Chip label={`Placa: ${dataArray && dataArray[0]?.license}`} />
+                    <Chip label={`Sentido: ${dataArray && dataArray[0]?.way}`} />
+                  </Grid>
+                  <Grid item xs={12} md={12} lg={6} padding={1} style={{display: 'flex', gap:'10px'}}>
+                  <Typography id="modalTittle" variant="h6" component="h2" sx={{marginBottom : "10px", marginLeft: '5px'}}>
+                  Balança
+                  </Typography>
+                    <Chip label={`Data/Hora: ${dataArrayScale && dataArrayScale[0]?.pass_date}`} />
+                    <Chip label={`Placa: ${dataArrayScale && dataArrayScale[0]?.license !== null ? dataArrayScale && dataArrayScale[0]?.license : 'SEM PLACA'}`} />
+                    <Chip label={`Peso: ${dataArrayScale && dataArrayScale[0]?.weight}`} />
+                  </Grid>
+                  </Grid>
+              </CardContent>
+            </Card>
+
+      </Grid>
+      </Grid>
+      <Grid container padding={1} sx={{ display: 'flex', alignItems: 'flex-start'  }}>
+      <Grid item padding={1} xs={12} md={12} lg={12} >
+      <Card elevation={3}>
       <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
         <Tab label="Portaria" {...a11yProps(0)} />
         <Tab label="Balança" {...a11yProps(1)} />
       </Tabs>
+      <CardContent>
       <TabPanel value={value} index={0}>
       {(dateStart !== null && dateEnd !== null && dataFlow !== null) ? (
         <>
-        
         <Grid container spacing={2} sx={{ display: 'flex', alignItems: 'flex-start'  }}>
-          
           <Grid item xs={12} md={12} lg={8} >
-          <Card elevation={3}>
+          <Card elevation={4}>
             <CardContent>
             <Grid item xs={12} md={12} lg={12} padding={1}>
             
@@ -339,18 +397,14 @@ function Home() {
               </Grid>
 
               <Grid item xs={12} md={6} lg={2} sx={{ justifyContent: "flex-start", display: "flex"}}>
-              <Button id="searcFlow" variant="contained" color="button"  onClick={() => setStartSeach(true)}  endIcon={<Search />}>Buscar</Button>
+              <Button id="searcFlow" variant="contained" color="button"  onClick={() => setStartSearch(true)}  endIcon={<Search />}>Buscar</Button>
               </Grid>
 
               <Grid item xs={12} md={6} lg={2} sx={{ justifyContent: "flex-start", display: "flex"}}>
               <Button id="refresh" variant="contained" color="button"  onClick={() => setRefresh(true)}  endIcon={<Sync />}>Atualizar</Button>
-              
               </Grid>
-              
             </Grid>
-
           </Grid>
-
             <Grid item xs={12} md={12} lg={12} padding={1} style={{ maxHeight: '600px', overflow: 'auto', scrollbarGutter: 'stable'}}>
               <DataGrid
                 id="dataGridFlow"
@@ -370,7 +424,7 @@ function Home() {
           </Grid>
           
           <Grid item xs={12} md={12} lg={4} sx={{ alignItems: "flex-start", display: "flex"}}>
-          <Card elevation={3} sx={{ alignItems: "center", display: "flex", flexDirection: "column"}}> 
+          <Card elevation={4} sx={{ alignItems: "center", display: "flex", flexDirection: "column"}}> 
           <h4>Câmera Portaria</h4>
           <CardContent>
           <div id="video-canvas" style={{ height: "480px", width: "580px" , margin : "10px"}}></div>
@@ -384,7 +438,7 @@ function Home() {
       <Grid container spacing={2} sx={{ display: 'flex', alignItems: 'flex-start'  }}>
 
           <Grid item xs={12} md={12} lg={8}>
-            <Card elevation={3}>
+            <Card elevation={4}>
             <CardContent>
             <Grid item xs={12} md={12} lg={12} padding={1} sx={{marginBottom : "10px"}} > 
             <Grid container spacing={1}>   
@@ -455,7 +509,7 @@ function Home() {
           </Grid>
 
           <Grid item xs={12} md={12} lg={4} sx={{ alignItems: "flex-start", display: "flex"}}>
-          <Card elevation={3} sx={{ alignItems: "center", display: "flex", flexDirection: "column"}}>
+          <Card elevation={4} sx={{ alignItems: "center", display: "flex", flexDirection: "column"}}>
           <h4>Peso Atual</h4>
           <CardContent>
           <TextField
@@ -473,6 +527,10 @@ function Home() {
           </Grid>
         </Grid>
       </TabPanel>
+      </CardContent>
+      </Card>
+      </Grid>
+      </Grid>
       </Card>
       </Grid>
 
