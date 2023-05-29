@@ -3,12 +3,13 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import {  toast } from 'react-toastify';
 import dayjs from 'dayjs';
-import { Search, Sync, Edit, Close, Save } from '@mui/icons-material/';
+import ModalImage from './ModalImage';
+import { Search, Sync, Edit, Close, Save, Visibility } from '@mui/icons-material/';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import JSMpeg from '@cycjimmy/jsmpeg-player';
 import axios from 'axios';
 import { DataGrid } from '@mui/x-data-grid';
-import {Grid, Chip, Tabs, Tab, Typography, Box, Card, CardHeader, TextField, CircularProgress, Button, InputAdornment, IconButton, Modal, CardContent } from '@mui/material/';
+import {Grid, Chip, Tabs, Tab, Typography, Box, Card, TextField, CircularProgress, Button, InputAdornment, IconButton, Modal, CardContent } from '@mui/material/';
 import moment from "moment/moment";
 
 const styleModal = {
@@ -59,6 +60,8 @@ function TabPanel(props) {
 function Home() {
   const [ value, setValue ] = useState(0);
   const [ open, setOpen] = useState(false);
+  const [ imageDataQuery, setImageDataQuery ] = useState(null);
+  const [ openImage, setOpenImage] = useState(false);
   const [ dataFlow, setDataFlow ] = useState(null);
   const [ dataScale, setDataScale ] = useState(null);
   const [ dataArray, setDataArray ] = useState([]);
@@ -93,8 +96,14 @@ function Home() {
     setWeightEdit(row.weight);
     setPassDateEdit(row.pass_date);
     setLicenseEdit(row.license);
-    setOpen(true)
-};
+    setOpen(true);
+  };
+
+  const onButtonClickView = (e, row) => {
+    e.stopPropagation();
+    setImageDataQuery({pass_date : row.pass_date, license : row.license});
+    setOpenImage(true);
+  };
 
   async function getDataFlow(){
     const getData = await axios.get(`http://${process.env.REACT_APP_BACKEND_SERVER}/api/database/listFlow`,{headers : {startdate : dateStart, finaldate : dateEnd}});
@@ -121,6 +130,7 @@ function Home() {
       getScale().then((response) => {setActualWeight(response)});
     }, 1500);
     return () => clearInterval(interval);
+    
   }, []);
 
 
@@ -140,8 +150,6 @@ function Home() {
     }
       
   }, [startSearchInterval]);
-
-
 
   useEffect(() => {
     setDateEnd(moment(actualDate).format("YYYY/MM/DD HH:mm:ss"));
@@ -224,6 +232,16 @@ function Home() {
     { field: 'license', headerName: 'Placa', width: 150 },
     { field: 'pass_date', headerName: 'Data/Hora', width: 200 },
     { field: 'way', headerName: 'Sentido', width: 130 },
+    { field: 'actions', headerName: 'Ações', width: 50, renderCell: (params) => {
+      return (
+        <>
+        <IconButton
+          onClick={(e) => {onButtonClickView(e, params.row);}}>
+          <Visibility/>
+        </IconButton>
+        </>
+      );
+    } }
   ];
 
   const columnsScale = [
@@ -232,16 +250,24 @@ function Home() {
     { field: 'weight', headerName: 'Peso', width: 130 },
     { field: 'actions', headerName: 'Ações', width: 50, renderCell: (params) => {
       return (
+        <>
         <IconButton
           onClick={(e) => {onButtonClick(e, params.row);}}>
             <Edit/>
         </IconButton>
+        </>
       );
     } }
   ];
   
   return (
-<>
+    <>
+
+          <ModalImage
+            openModal={openImage}
+            closeModal={setOpenImage}
+            dataImg={imageDataQuery}
+          />
           <Modal
             open={open}
             onClose={handleClose}
@@ -298,20 +324,15 @@ function Home() {
             </Grid>
             </Box>
           </Modal>
-
   
     <Grid container padding={1} spacing={1}>
-      
       <Grid item xs={12} md={12} lg={12}>
-
       <Card>
-
       <Grid container padding={1} sx={{ display: 'flex', alignItems: 'flex-start'  }}>
         <Grid item padding={1} xs={12} md={12} lg={12} >
         <Typography id="modalTittle" variant="h6" component="h2" sx={{marginBottom : "10px", marginLeft: '5px'}}>
           Home
         </Typography>
-
             <Card elevation={3}>
               <CardContent>
                 <Grid container>
@@ -440,89 +461,89 @@ function Home() {
           <Grid item xs={12} md={12} lg={8}>
             <Card elevation={4}>
             <CardContent>
-            <Grid item xs={12} md={12} lg={12} padding={1} sx={{marginBottom : "10px"}} > 
-            <Grid container spacing={1}>   
-              <Grid item xs={12} md={6} lg={3} sx={{ justifyContent: "flex-start", display: "flex"}}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DateTimePicker
-                id="filterStartDateScale"
-                label="Data Inicial"
-                format="DD/MM/YYYY HH:mm"
-                ampm={false}
-                value={dateStartScale === null ? dayjs('1970-08-18T21:11:54') : dayjs(dateStartScale) }
-                onChange={(e) => setDateStartScale(dayjs(e).format("YYYY/MM/DD HH:mm:ss"))}
+              <Grid item xs={12} md={12} lg={12} padding={1} sx={{marginBottom : "10px"}} > 
+              <Grid container spacing={1}>   
+                <Grid item xs={12} md={6} lg={3} sx={{ justifyContent: "flex-start", display: "flex"}}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateTimePicker
+                  id="filterStartDateScale"
+                  label="Data Inicial"
+                  format="DD/MM/YYYY HH:mm"
+                  ampm={false}
+                  value={dateStartScale === null ? dayjs('1970-08-18T21:11:54') : dayjs(dateStartScale) }
+                  onChange={(e) => setDateStartScale(dayjs(e).format("YYYY/MM/DD HH:mm:ss"))}
+                  
+                />
+                </LocalizationProvider>
+                </Grid>
+      
+                <Grid item xs={12} md={6} lg={3} sx={{ justifyContent: "flex-start", display: "flex"}}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateTimePicker
+                  id="filtere=EndDateScale"
+                  format="DD/MM/YYYY HH:mm"
+                  label="Data Final"
+                  ampm={false}
+                  value={dateEndScale === null ? dayjs('1970-08-18T21:11:54') : dayjs(dateEndScale) }
+                  onChange={(e) => setDateEndScale(dayjs(e).format("YYYY/MM/DD HH:mm:ss"))}
+                />
+                </LocalizationProvider>
+                </Grid>
+      
+                <Grid item xs={12} md={6} lg={2} sx={{ justifyContent: "flex-start", display: "flex"}}>
+                <TextField 
+                  id="filterLicenseScale"
+                  label="Placa" 
+                  variant="outlined" 
+                  value={licenseFilterScale}
+                  onChange={(e) => setLicenseFilterScale(e.target.value)}
+                />
+                </Grid>
                 
-              />
-              </LocalizationProvider>
-              </Grid>
-    
-              <Grid item xs={12} md={6} lg={3} sx={{ justifyContent: "flex-start", display: "flex"}}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DateTimePicker
-                id="filtere=EndDateScale"
-                format="DD/MM/YYYY HH:mm"
-                label="Data Final"
-                ampm={false}
-                value={dateEndScale === null ? dayjs('1970-08-18T21:11:54') : dayjs(dateEndScale) }
-                onChange={(e) => setDateEndScale(dayjs(e).format("YYYY/MM/DD HH:mm:ss"))}
-              />
-              </LocalizationProvider>
-              </Grid>
-    
-              <Grid item xs={12} md={6} lg={2} sx={{ justifyContent: "flex-start", display: "flex"}}>
-              <TextField 
-                id="filterLicenseScale"
-                label="Placa" 
-                variant="outlined" 
-                value={licenseFilterScale}
-                onChange={(e) => setLicenseFilterScale(e.target.value)}
-              />
-              </Grid>
-              
-              <Grid item xs={12} md={6} lg={2} sx={{ justifyContent: "flex-start", display: "flex"}}>
-              <Button id="searchScale" variant="contained" color="button"  onClick={() => setStartSeachScale(true)}  endIcon={<Search />}>Buscar</Button>
-              </Grid>
+                <Grid item xs={12} md={6} lg={2} sx={{ justifyContent: "flex-start", display: "flex"}}>
+                <Button id="searchScale" variant="contained" color="button"  onClick={() => setStartSeachScale(true)}  endIcon={<Search />}>Buscar</Button>
+                </Grid>
 
-              <Grid item xs={12} md={6} lg={2} sx={{ justifyContent: "flex-start", display: "flex"}}>
-              <Button id="refresh" variant="contained" color="button"  onClick={() => setRefresh(true)}  endIcon={<Sync />}>Atualizar</Button>
-              </Grid>
+                <Grid item xs={12} md={6} lg={2} sx={{ justifyContent: "flex-start", display: "flex"}}>
+                <Button id="refresh" variant="contained" color="button"  onClick={() => setRefresh(true)}  endIcon={<Sync />}>Atualizar</Button>
+                </Grid>
+                
+                </Grid>
               
               </Grid>
-            
+              
+              <Grid item xs={12} md={12} lg={12} padding={1} style={{ maxHeight: '600px', overflow: 'auto', scrollbarGutter: 'stable'}}>
+                <DataGrid
+                  id="dataGridScale"
+                  rows={dataArrayScale || []}
+                  columns={columnsScale}
+                  initialState={{
+                    pagination: {
+                      paginationModel: { page: 0, pageSize: 20 },
+                    },
+                  }}
+                  pageSizeOptions={[5, 10, 20, 50]}
+                />
+              </Grid>
+              </CardContent>
+              </Card>
             </Grid>
-            
-            <Grid item xs={12} md={12} lg={12} padding={1} style={{ maxHeight: '600px', overflow: 'auto', scrollbarGutter: 'stable'}}>
-              <DataGrid
-                id="dataGridScale"
-                rows={dataArrayScale || []}
-                columns={columnsScale}
-                initialState={{
-                  pagination: {
-                    paginationModel: { page: 0, pageSize: 20 },
-                  },
-                }}
-                pageSizeOptions={[5, 10, 20, 50]}
-              />
-            </Grid>
-            </CardContent>
-            </Card>
-          </Grid>
 
-          <Grid item xs={12} md={12} lg={4} sx={{ alignItems: "flex-start", display: "flex"}}>
-          <Card elevation={4} sx={{ alignItems: "center", display: "flex", flexDirection: "column"}}>
-          <h4>Peso Atual</h4>
-          <CardContent>
-          <TextField
-          value={actualWeight}
-          id="actualWeightDisplay"
-          sx={{input: {textAlign: "center"}, margin: "20px", marginTop: "-2px"}}
-          InputProps={{
-            readOnly: true,
-            startAdornment: <InputAdornment position="start">kg</InputAdornment>,
-          }}
-          variant="outlined"
-        />
-        </CardContent>
+            <Grid item xs={12} md={12} lg={4} sx={{ alignItems: "flex-start", display: "flex"}}>
+            <Card elevation={4} sx={{ alignItems: "center", display: "flex", flexDirection: "column"}}>
+            <h4>Peso Atual</h4>
+            <CardContent>
+            <TextField
+            value={actualWeight}
+            id="actualWeightDisplay"
+            sx={{input: {textAlign: "center"}, margin: "20px", marginTop: "-2px"}}
+            InputProps={{
+              readOnly: true,
+              startAdornment: <InputAdornment position="start">kg</InputAdornment>,
+            }}
+            variant="outlined"
+          />
+          </CardContent>
           </Card>
           </Grid>
         </Grid>
@@ -535,7 +556,7 @@ function Home() {
       </Grid>
 
     </Grid>
-</>
+  </>
   );
 }
 
