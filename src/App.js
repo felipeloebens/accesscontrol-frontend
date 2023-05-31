@@ -12,88 +12,94 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PrivateRoute from "./Routes/privateRoute";
 
-function AppBar({darkMode, changeTheme}) {
-  const location = useLocation();
 
-  return <>
-    {location.pathname !== '/' && <Bar id="menuBar" check={darkMode} change={changeTheme}/>}
-    <Outlet/>
-  </>
-}
 
 function App() {
 
+  function AppBar({darkMode, changeTheme}) {
+    const location = useLocation();
+    return <>
+      {location.pathname !== '/' && <Bar id="menuBar" check={darkMode} change={changeTheme}/>}
+      <Outlet/>
+    </>
+  }
 
-const getDesignTokens = (mode) => ({
-  palette: {
-    mode,
-    primary: {
-      ...(mode === 'dark' 
-      ? {
-        main: '#ffffff',
-        } 
-      :{ 
-        main: lightBlue[900],
-      }),
-    },
-    button: {
-      ...(mode === 'dark' 
-      ? {
-        main: '#000000',
-        } 
-      :{ 
-        main: '#e0e0e0',
-      }),
-    },
-    background: {
-      ...(mode === 'dark' 
-      ? {
-        paper: "#f00",
-        } 
-      :{ 
-        paper: "#f00",
-      }),
-    },
-    secondary: {
-      ...(mode === 'dark' 
-      ? {
-        main: '#ffffff',
-      }
-      : {
-        main: '#ffffff',
-      }
-      
-)},
-    ...(mode === 'dark' 
-    ? {
-      background: {
-        default: grey[900],
-        paper: grey[900],
-      },
-      }
-    : {
-      background: {
-        default: grey[50],
-        paper: grey[50],
-      },
-    }),
-    text: {
-      ...(mode === 'light'
+
+  const getDesignTokens = (mode) => ({
+    palette: {
+      mode,
+      primary: {
+        ...(mode === 'dark' 
         ? {
-            primary: grey[900],
-            secondary: grey[800],
-          }
+          main: '#ffffff',
+          } 
+        :{ 
+          main: lightBlue[900],
+        }),
+      },
+      button: {
+        ...(mode === 'dark' 
+        ? {
+          main: '#000000',
+          } 
+        :{ 
+          main: '#e0e0e0',
+        }),
+      },
+      background: {
+        ...(mode === 'dark' 
+        ? {
+          paper: "#f00",
+          } 
+        :{ 
+          paper: "#f00",
+        }),
+      },
+      secondary: {
+        ...(mode === 'dark' 
+        ? {
+          main: '#ffffff',
+        }
         : {
-            primary: '#fff',
-            secondary: grey[500],
-          }),
+          main: '#ffffff',
+        }
+        
+  )},
+      ...(mode === 'dark' 
+      ? {
+        background: {
+          default: grey[900],
+          paper: grey[900],
+        },
+        }
+      : {
+        background: {
+          default: grey[50],
+          paper: grey[50],
+        },
+      }),
+      text: {
+        ...(mode === 'light'
+          ? {
+              primary: grey[900],
+              secondary: grey[800],
+            }
+          : {
+              primary: '#fff',
+              secondary: grey[500],
+            }),
+      },
     },
-  },
-});
+  });
 
-const[darkMode,setDarkMode]=useState(false)
-const theme = createTheme(getDesignTokens(darkMode?"dark":"light"));
-
+  const[darkMode,setDarkMode]=useState(false);
+  const theme = createTheme(getDesignTokens(darkMode?"dark":"light"));
+  
+  const changeTheme = () => {
+    localStorage.setItem("dark", darkMode ? "light" : "dark");
+    setDarkMode(!darkMode);
+    console.log(darkMode);
+  };
 
   useEffect(() => {
     const mode = localStorage.getItem("dark") || "dark";
@@ -104,14 +110,7 @@ const theme = createTheme(getDesignTokens(darkMode?"dark":"light"));
     }
   }, []);
 
-
-  const changeTheme = () => {
-    localStorage.setItem("dark", darkMode ? "light" : "dark");
-    setDarkMode(!darkMode);
-  };
-
   return (
-
     <ThemeProvider theme={theme}>
       <CssBaseline/>
       <Router>

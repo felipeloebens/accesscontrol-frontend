@@ -29,7 +29,7 @@ const styleCloseButton = {
   top: '2%',
 };
 
-export default function Bar(props,{check,change}) {
+export default function Bar({check,change, ...props}) {
   
     const [anchorElNav, setAnchorElNav] = useState(null);
     const [anchorElUser, setAnchorElUser] = useState(null);
