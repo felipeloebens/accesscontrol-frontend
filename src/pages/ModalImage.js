@@ -44,7 +44,7 @@ export default function ModalImage({
     setImageCamera1(getData.data);
     setTimeout(() => {
       setLoading(false);
-    }, 300)
+    }, 350)
   }
 
   useEffect(() => {
